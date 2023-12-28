@@ -1,4 +1,21 @@
 <?php
+
+/*****************************
+ *
+ * RouterOS PHP API class v1.6
+ * Author: Denis Basta
+ * Contributors:
+ *    Nick Barnes
+ *    Ben Menking (ben [at] infotechsc [dot] com)
+ *    Jeremy Jefferson (http://jeremyj.com)
+ *    Cristian Deluxe (djcristiandeluxe [at] gmail [dot] com)
+ *    Mikhail Moskalev (mmv.rus [at] gmail [dot] com)
+ *
+ * http://www.mikrotik.com
+ * http://wiki.mikrotik.com/wiki/API_PHP_class
+ *
+ ******************************/
+
 class RouterosAPI
 {
     var $debug     = false; //  Show debug information
@@ -38,6 +55,7 @@ class RouterosAPI
         }
     }
 
+
     /**
      *
      *
@@ -65,6 +83,16 @@ class RouterosAPI
         return $length;
     }
 
+
+    /**
+     * Login to RouterOS
+     *
+     * @param string      $ip         Hostname (IP or domain) of the RouterOS server
+     * @param string      $login      The RouterOS username
+     * @param string      $password   The RouterOS password
+     *
+     * @return boolean                If we are connected or not
+     */
     public function koneksi($ip, $login, $password)
     {
         for ($ATTEMPT = 1; $ATTEMPT <= $this->attempts; $ATTEMPT++) {
@@ -116,14 +144,22 @@ class RouterosAPI
         return $this->connected;
     }
 
+
+    /**
+     * Disconnect from RouterOS
+     *
+     * @return void
+     */
     public function disconnect()
     {
+        // let's make sure this socket is still valid.  it may have been closed by something else
         if (is_resource($this->socket)) {
             fclose($this->socket);
         }
         $this->connected = false;
         $this->debug('Disconnected...');
     }
+
 
     /**
      * Parse response from Router OS
@@ -141,9 +177,9 @@ class RouterosAPI
             foreach ($response as $x) {
                 if (in_array($x, array('!fatal', '!re', '!trap'))) {
                     if ($x == '!re') {
-                        $CURRENT = &$PARSED[0];
+                        $CURRENT = &$PARSED[];
                     } else {
-                        $CURRENT = &$PARSED[$x][0];
+                        $CURRENT = &$PARSED[$x][];
                     }
                 } elseif ($x != '!done') {
                     $MATCHES = array();
@@ -155,14 +191,17 @@ class RouterosAPI
                     }
                 }
             }
+
             if (empty($PARSED) && !is_null($singlevalue)) {
                 $PARSED = $singlevalue;
             }
+
             return $PARSED;
         } else {
             return array();
         }
     }
+
 
     /**
      * Parse response from Router OS
@@ -180,9 +219,9 @@ class RouterosAPI
             foreach ($response as $x) {
                 if (in_array($x, array('!fatal', '!re', '!trap'))) {
                     if ($x == '!re') {
-                        $CURRENT = &$PARSED[0];
+                        $CURRENT = &$PARSED[];
                     } else {
-                        $CURRENT = &$PARSED[$x][0];
+                        $CURRENT = &$PARSED[$x][];
                     }
                 } elseif ($x != '!done') {
                     $MATCHES = array();
@@ -205,6 +244,7 @@ class RouterosAPI
             return array();
         }
     }
+
 
     /**
      * Change "-" and "/" from array key to "_"
@@ -230,6 +270,7 @@ class RouterosAPI
             return $array;
         }
     }
+
 
     /**
      * Read data from Router OS
@@ -348,6 +389,7 @@ class RouterosAPI
         }
     }
 
+
     /**
      * Write (send) data to Router OS
      *
@@ -379,9 +421,15 @@ class RouterosAPI
                 $this->write($el, $last);
             }
         }
+
         return $this->read();
     }
 
+    /**
+     * Standard destructor
+     *
+     * @return void
+     */
     public function __destruct()
     {
         $this->disconnect();
