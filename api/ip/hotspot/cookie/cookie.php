@@ -4,7 +4,6 @@ require('../../../../config/koneksi.php');
 $cookieData = $API->comm('/ip/hotspot/cookie/print');
 
 if ($cookieData !== null) {
-    // Transformasi data jika diperlukan
     $transformedData = [
         'status' => true,
         'data' => $cookieData,
